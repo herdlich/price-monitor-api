@@ -32,7 +32,7 @@ def add_product(payload: AddProduct):
             detail="Disallowed URL: This domain is not permitted"
         )
 
-    added_product = add_product_by_link(payload.link)
+    added_product = add_product_by_link(payload.link, DB_PATH)
     if not added_product:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

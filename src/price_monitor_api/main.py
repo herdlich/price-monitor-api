@@ -87,10 +87,10 @@ def product_existence_check(url, db_file):
     return False
 
 
-def add_product_by_link(page_url):
+def add_product_by_link(page_url, db_file):
     setup_logging()
 
-    flag_existence = product_existence_check(page_url, DB_PATH)
+    flag_existence = product_existence_check(page_url, db_file)
     if flag_existence is True:
         return None
 
@@ -104,7 +104,7 @@ def add_product_by_link(page_url):
         logger.error("Product page could not be parsed")
         return None
 
-    saved_product = save_db(DB_PATH, product_dict)
+    saved_product = save_db(db_file, product_dict)
 
     if saved_product:
         logger.info("Product saved: \"%s\", id=%s",
