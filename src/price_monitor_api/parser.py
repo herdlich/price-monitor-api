@@ -3,7 +3,6 @@ import requests
 import logging
 from datetime import datetime
 from bs4 import BeautifulSoup as BS
-from decimal import Decimal, InvalidOperation
 
 logger = logging.getLogger(__name__)
 
