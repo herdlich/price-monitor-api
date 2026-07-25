@@ -3,6 +3,7 @@ import requests
 import logging
 from datetime import datetime
 from bs4 import BeautifulSoup as BS
+from decimal import Decimal, InvalidOperation
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,57 @@ def get_html(url):
 
     except requests.RequestException as error:
         logger.error("Request error: %s\nURL: %s", error, url)
+        return None
+
+
+def parse_price_value(price_text: str) -> float | None:
+    text = price_text.strip()
+
+    if text.casefold() in ["free to play"]:
+        return float(0)
+
+    match = re.search(r"\d(?:[\d.,\s\xa0]*\d)?", text)
+    if match is None:
+        logger.error("Could not find price: %s", price_text)
+        return None
+
+    raw_price = re.sub(r"[\s\xa0]+", "", match.group())
+
+    has_comma = "," in raw_price
+    has_dot = "." in raw_price
+    decimal_separator = None
+
+    if has_comma and has_dot:
+        decimal_separator = (
+            "," if raw_price.rstrip(",") > raw_price.rstrip(".") else "."
+        )
+
+    elif has_comma or has_dot:
+        separator = "," if has_comma else "."
+        fraction_length = len(raw_price.rsplit(separator, 1)[1])
+
+        if fraction_length in (1, 2):
+            decimal_separator = separator
+
+    if decimal_separator:
+        integer_part, fractional_part = raw_price.rsplit(
+            decimal_separator,
+            1
+        )
+
+        integer_part = re.sub(r"[.,]", "", integer_part)
+        normalized_price = f"{integer_part}.{fractional_part}"
+
+    else:
+        normalized_price = re.sub(r"[.,]", "", raw_price)
+
+    try:
+        return float(normalized_price)
+
+    except ValueError as e:
+        logger.warning("Invalid price value: %s, normalized: %s",
+                       raw_price, normalized_price)
+
         return None
 
 
@@ -58,23 +110,7 @@ def parse_page(html_text):
 
     price_text = price_element.get_text(" ", strip=True)
 
-    if price_text.lower() == "free to play":
-        clean_price = 0
-    else:
-        match = re.search(r"\d[\d.,\s\xa0]*", price_text)
-        if match is None:
-            logger.error("Could not parse price: %s",
-                         price_text)
-            return None
-
-        clean_price = re.sub(r"[\s\xa0]+", "", match.group())
-        clean_price = clean_price.replace(",", ".")
-
-    try:
-        price = float(clean_price)
-    except ValueError:
-        logger.error("Invalid price value: %s", clean_price)
-        return None
+    price = parse_price_value(price_text)
 
     currency = re.sub(r"[\d\s\xa0.,]+", "", price_text).strip()
     if currency.lower() == "freetoplay":
