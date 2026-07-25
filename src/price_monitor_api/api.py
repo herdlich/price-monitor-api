@@ -36,7 +36,12 @@ db_init(DB_PATH)
 Path("data").mkdir(exist_ok=True)
 
 
-@app.post("/products", response_model=ProductResponse, status_code=status.HTTP_201_CREATED, tags=["Products"])
+@app.post(
+    "/products",
+          response_model=ProductResponse,
+          status_code=status.HTTP_201_CREATED,
+          tags=["Products"]
+)
 def add_product(payload: AddProduct):
     permitted_domain = "https://store.steampowered.com/"
     if payload.link[:31] != permitted_domain:
@@ -52,7 +57,11 @@ def add_product(payload: AddProduct):
     return added_product
 
 
-@app.get("/products", response_model=list[ProductResponse], tags=["Products"])
+@app.get(
+    "/products",
+    response_model=list[ProductResponse],
+    tags=["Products"]
+)
 def get_products():
     all_products = get_all_products(DB_PATH)
     if not all_products:
@@ -63,7 +72,11 @@ def get_products():
     return all_products
 
 
-@app.get("/products/{product_id}", response_model=ProductResponse, tags=["Products"])
+@app.get(
+    "/products/{product_id}",
+    response_model=ProductResponse,
+    tags=["Products"]
+)
 def get_product(product_id: int):
     product = get_product_by_id(DB_PATH, product_id)
     if not product:
@@ -74,7 +87,11 @@ def get_product(product_id: int):
     return product
 
 
-@app.get("/products/{product_id}/price-history", response_model=list[PriceHistoryResponse], tags=["Products"])
+@app.get(
+    "/products/{product_id}/price-history",
+    response_model=list[PriceHistoryResponse],
+    tags=["Products"]
+)
 def get_price_history(product_id: int):
     product_history = get_the_price_history_by_id(DB_PATH, product_id)
     if not product_history:
@@ -85,7 +102,11 @@ def get_price_history(product_id: int):
     return product_history
 
 
-@app.delete("/products/{product_id}", response_model=ProductResponse, tags=["Products"])
+@app.delete(
+    "/products/{product_id}",
+    response_model=ProductResponse,
+    tags=["Products"]
+)
 def delete_product(product_id: int):
     product = get_product_by_id(DB_PATH, product_id)
     if product is None:
@@ -96,7 +117,11 @@ def delete_product(product_id: int):
     return product
 
 
-@app.post("/products/refresh-prices", response_model=list[UpdatedPriceHistoryResponse], tags=["Products"])
+@app.post(
+    "/products/refresh-prices",
+    response_model=list[UpdatedPriceHistoryResponse],
+    tags=["Products"]
+)
 def refresh_product_prices():
     products = check_actual_products(DB_PATH)
     if products is False:
