@@ -1,6 +1,5 @@
 from .database import save_db, get_all_products, update_product
 from .parser import get_html, parse_page
-from .config import DB_PATH
 from pathlib import Path
 import logging
 

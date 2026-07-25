@@ -13,11 +13,6 @@ def client(monkeypatch, tmp_path):
         path_db
     )
 
-    monkeypatch.setattr(
-        "price_monitor_api.main.DB_PATH",
-        path_db
-    )
-
     db_init(path_db)
 
     return TestClient(app)
