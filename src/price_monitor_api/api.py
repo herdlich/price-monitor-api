@@ -43,13 +43,6 @@ Path("data").mkdir(exist_ok=True)
           tags=["Products"]
 )
 def add_product(payload: AddProduct):
-    permitted_domain = "https://store.steampowered.com/"
-    if payload.link[:31] != permitted_domain:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Disallowed URL: This domain is not permitted"
-        )
-
     added_product = add_product_by_link(payload.link, DB_PATH)
     if not added_product:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

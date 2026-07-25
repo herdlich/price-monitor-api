@@ -1,4 +1,9 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    HttpUrl,
+    field_validator
+)
 
 
 class ProductBase(BaseModel):
@@ -6,7 +11,17 @@ class ProductBase(BaseModel):
 
 
 class AddProduct(BaseModel):
-    link: str
+    link: HttpUrl
+
+    @field_validator("link")
+    @classmethod
+    def validate_steam_links(cls, url: HttpUrl) -> HttpUrl:
+        if url.scheme != "https":
+            raise ValueError("Only HTTPS links are permitted")
+        if url.host != "store.steampowered.com":
+            raise ValueError("Only store.steampowered.com links permitted")
+
+        return url
 
 
 class ProductResponse(BaseModel):
