@@ -28,6 +28,7 @@ def db_init(db_file):
                 currency TEXT NOT NULL,
                 discount TEXT NOT NULL,
                 link TEXT NOT NULL UNIQUE,
+                app_id INTEGER NOT NULL UNIQUE,
                 created_at TEXT NOT NULL
             )
             """)
@@ -83,14 +84,15 @@ def save_db(db_file, data):
             cursor = db.cursor()
 
             cursor.execute("""
-                INSERT OR IGNORE INTO products (name, price, currency, discount, link, created_at)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT OR IGNORE INTO products (name, price, currency, discount, link, app_id, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (
                 data["name"],
                 data["price"],
                 data["currency"],
                 data["discount"],
                 data["link"],
+                data["app_id"],
                 data["created_at"]
             ))
 
@@ -106,6 +108,7 @@ def save_db(db_file, data):
                     "currency": data["currency"],
                     "discount": data["discount"],
                     "link": data["link"],
+                    "app_id": data["app_id"],
                     "created_at": data["created_at"]
                 }
 
@@ -124,7 +127,7 @@ def get_all_products(db_file):
             cursor = db.cursor()
 
             cursor.execute("""
-                SELECT id, name, price, currency, discount, link, created_at FROM products
+                SELECT id, name, price, currency, discount, link, app_id, created_at FROM products
             """)
 
             rows = cursor.fetchall()
@@ -148,7 +151,7 @@ def get_product_by_id(db_file, product_id):
             cursor = db.cursor()
 
             cursor.execute("""
-            SELECT id, name, price, currency, discount, link, created_at
+            SELECT id, name, price, currency, discount, link, app_id, created_at
             FROM products
             WHERE id = ?
             """, (product_id,))
@@ -228,3 +231,28 @@ def update_product(db_file, product_id, data):
                 )
 
             insert_price_history(cursor, product_id, data)
+
+
+def get_product_by_app_id(db_file, app_id):
+    Path(db_file).parent.mkdir(exist_ok=True)
+
+    connection = create_connection(db_file)
+
+    connection.row_factory = sqlite3.Row
+
+    with closing(connection) as db:
+        with db:
+            cursor = db.cursor()
+
+            cursor.execute("""
+                SELECT *
+                FROM products
+                WHERE app_id = ?
+            """, (app_id,))
+
+            row = cursor.fetchone()
+
+    if not row:
+        return None
+
+    return dict(row)

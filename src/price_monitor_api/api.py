@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException, status
 from pathlib import Path
 import logging
 
+from .exceptions import ProductAlreadyExistsError
+
 from .database import (
     db_init,
     get_all_products,
@@ -38,12 +40,23 @@ Path("data").mkdir(exist_ok=True)
 
 @app.post(
     "/products",
-          response_model=ProductResponse,
-          status_code=status.HTTP_201_CREATED,
-          tags=["Products"]
+    response_model=ProductResponse,
+    status_code=status.HTTP_201_CREATED,
+    tags=["Products"]
 )
 def add_product(payload: AddProduct):
-    added_product = add_product_by_link(payload.link, DB_PATH)
+    try:
+        added_product = add_product_by_link(str(payload.link), DB_PATH)
+    except ProductAlreadyExistsError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "code": "product_already_exists",
+                "message": str(exc),
+                "product_name": exc.product_name
+            }
+        ) from exc
+
     if not added_product:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

@@ -73,18 +73,28 @@ def test_product_existence_check(tmp_path, payload):
 
     save_products_to_db(path_db, payload)
 
-    example_url = "example.example"
-    product_false_existence_status = product_existence_check(example_url, path_db)
+    app_id = 4704690
+    product_existence_status_none = product_existence_check(9999, path_db)
 
-    assert product_false_existence_status == False
+    assert product_existence_status_none == None
 
-    first_product_url = "https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/"
-    product_true_existence_status = product_existence_check(first_product_url, path_db)
+    product_existence = product_existence_check(app_id, path_db)
 
-    assert product_true_existence_status == True
+    expected_product_existence = {
+        "id": 1,
+        "name": "MECCHA CHAMELEON",
+        "price": 6.15,
+        "currency": "€",
+        "discount": "No discount",
+        "link": "https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/",
+        "app_id": app_id,
+        "created_at": "2026-07-22 19:14:15",
+    }
+
+    assert product_existence == expected_product_existence
 
 
-def test_add_product_by_link(tmp_path, payload, monkeypatch):
+def test_add_product_by_link(tmp_path, monkeypatch):
     path_db = tmp_path / "data" / "products.db"
 
     db_init(path_db)
@@ -100,6 +110,7 @@ def test_add_product_by_link(tmp_path, payload, monkeypatch):
         "currency": "€",
         "discount": "No discount",
         "link": "https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/",
+        "app_id": 4704690,
         "created_at": "2026-07-22 19:14:15",
     }
 
@@ -109,7 +120,7 @@ def test_add_product_by_link(tmp_path, payload, monkeypatch):
     )
 
     product_link = "https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/"
-    added_product = add_product_by_link("product_link", path_db)
+    added_product = add_product_by_link(product_link, path_db)
 
     assert added_product is not None
 
@@ -120,6 +131,7 @@ def test_add_product_by_link(tmp_path, payload, monkeypatch):
         "currency": "€",
         "discount": "No discount",
         "link": "https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/",
+        "app_id": 4704690,
         "created_at": "2026-07-22 19:14:15",
     }
 
@@ -137,6 +149,7 @@ def test_add_product_by_link(tmp_path, payload, monkeypatch):
             "currency": "€",
             "discount": "No discount",
             "link": "https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/",
+            "app_id": 4704690,
             "created_at": "2026-07-22 19:14:15",
         },
     ]

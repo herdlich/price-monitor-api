@@ -1,5 +1,14 @@
-from .database import save_db, get_all_products, update_product
+from .database import (
+    save_db,
+    get_all_products,
+    update_product,
+    get_product_by_app_id
+)
+
 from .parser import get_html, parse_page
+from .exceptions import ProductAlreadyExistsError
+
+from urllib.parse import urlsplit
 from pathlib import Path
 import logging
 
@@ -75,23 +84,38 @@ def check_actual_products(db_file):
     return changed_products
 
 
-def product_existence_check(url, db_file):
+def extract_app_id(url):
+    parsed_url = urlsplit(url)
+
+    parts = parsed_url.path.strip("/").split("/")
+
+    if parts[0] == "app" and parts[1].isdigit:
+        return parts[1]
+
+    return None
+
+
+def product_existence_check(app_id, db_file):
     products = get_all_products(db_file)
 
     for product in products:
-        if product["link"] == url:
-            logger.warning('The product "%s" has already been added', product["name"])
-            return True
+        product_by_app_id = get_product_by_app_id(db_file, app_id)
 
-    return False
+        if product_by_app_id:
+            logger.warning('The product "%s" has already been added', product["name"])
+            return product
+
+    return None
 
 
 def add_product_by_link(page_url, db_file):
     setup_logging()
 
-    flag_existence = product_existence_check(page_url, db_file)
-    if flag_existence is True:
-        return None
+    app_id_from_link = extract_app_id(page_url)
+
+    existing_product = product_existence_check(app_id_from_link, db_file)
+    if existing_product:
+        raise ProductAlreadyExistsError(existing_product["name"])
 
     html_text = get_html(page_url)
     if not html_text:
@@ -103,6 +127,8 @@ def add_product_by_link(page_url, db_file):
         logger.error("Product page could not be parsed")
         return None
 
+    product_dict["app_id"] = int(app_id_from_link)
+
     saved_product = save_db(db_file, product_dict)
 
     if saved_product:
@@ -113,5 +139,5 @@ def add_product_by_link(page_url, db_file):
 
     else:
         logger.info("Product \"%s\" was not saved",
-                    product_dict["name"], )
+                    product_dict["name"])
         return None
