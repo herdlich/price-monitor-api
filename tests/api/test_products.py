@@ -35,6 +35,7 @@ def test_post_product(client, tmp_path, monkeypatch):
         "currency": "€",
         "discount": "No discount",
         "link": "https://store.steampowered.com/app/3949040/RV_There_Yet/",
+        "app_id": 3949040,
     }
 
     # test for POST
@@ -58,6 +59,7 @@ def test_post_product(client, tmp_path, monkeypatch):
             "currency": "€",
             "discount": "No discount",
             "link": "https://store.steampowered.com/app/3949040/RV_There_Yet/",
+            "app_id": 3949040,
         }
     ]
 
@@ -84,6 +86,7 @@ def test_get_all_products(client, payload, tmp_path):
             "currency": "€",
             "discount": "No discount",
             "link": "https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/",
+            "app_id": 4704690,
             "created_at": "2026-07-22 19:14:15",
         },
         {
@@ -93,6 +96,7 @@ def test_get_all_products(client, payload, tmp_path):
             "currency": "€",
             "discount": "Discount",
             "link": "https://store.steampowered.com/app/1466060/Tainted_Grail_The_Fall_of_Avalon/",
+            "app_id": 1466060,
             "created_at": "2026-07-23 12:28:08",
         }
     ]
@@ -118,6 +122,7 @@ def test_get_product_by_id(client, payload, tmp_path):
         "currency": "€",
         "discount": "Discount",
         "link": "https://store.steampowered.com/app/1466060/Tainted_Grail_The_Fall_of_Avalon/",
+        "app_id": 1466060,
         "created_at": "2026-07-23 12:28:08",
     }
 
@@ -141,6 +146,7 @@ def test_delete_product_by_id(client, payload, tmp_path):
         "currency": "€",
         "discount": "No discount",
         "link": "https://store.steampowered.com/app/4704690/MECCHA_CHAMELEON/",
+        "app_id": 4704690,
         "created_at": "2026-07-22 19:14:15",
     }
 
@@ -159,6 +165,7 @@ def test_delete_product_by_id(client, payload, tmp_path):
             "currency": "€",
             "discount": "Discount",
             "link": "https://store.steampowered.com/app/1466060/Tainted_Grail_The_Fall_of_Avalon/",
+            "app_id": 1466060,
             "created_at": "2026-07-23 12:28:08",
         }
     ]

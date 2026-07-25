@@ -86,32 +86,36 @@ def check_actual_products(db_file):
 
 def extract_app_id(url):
     parsed_url = urlsplit(url)
-
     parts = parsed_url.path.strip("/").split("/")
 
-    if parts[0] == "app" and parts[1].isdigit:
-        return parts[1]
+    try:
+        app_index = parts.index("app")
+        app_id = parts[app_index + 1]
+    except (ValueError, IndexError):
+        return None
+
+    if app_id.isdigit():
+        return app_id
 
     return None
 
 
 def product_existence_check(app_id, db_file):
-    products = get_all_products(db_file)
+    product = get_product_by_app_id(db_file, app_id)
 
-    for product in products:
-        product_by_app_id = get_product_by_app_id(db_file, app_id)
+    if product:
+        logger.warning('Product "%s" has already been added', product["name"])
 
-        if product_by_app_id:
-            logger.warning('The product "%s" has already been added', product["name"])
-            return product
-
-    return None
+    return product
 
 
 def add_product_by_link(page_url, db_file):
     setup_logging()
 
     app_id_from_link = extract_app_id(page_url)
+    if app_id_from_link is None:
+        logger.warning("Invalid Steam application URL: %s", page_url)
+        return None
 
     existing_product = product_existence_check(app_id_from_link, db_file)
     if existing_product:

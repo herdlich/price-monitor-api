@@ -31,6 +31,7 @@ class ProductResponse(BaseModel):
     currency: str
     discount: str
     link: str
+    app_id: int
     created_at: str
 
 
