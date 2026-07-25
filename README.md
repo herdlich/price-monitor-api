@@ -21,7 +21,7 @@ Automatic scheduled checks and Telegram notifications are planned.
 
 ## Demo
 
-![Swagger UI](price_monitor_api/docs/swagger.png)
+![Swagger UI](docs/swagger.png)
 
 ## Features
 
