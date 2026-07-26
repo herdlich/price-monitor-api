@@ -115,7 +115,7 @@ def get_price_history(product_id: int):
 )
 def delete_product(product_id: int):
     product = get_product_by_id(DB_PATH, product_id)
-    if product is None:
+    if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
 
     delete_product_by_id(DB_PATH, product_id)
