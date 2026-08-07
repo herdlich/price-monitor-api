@@ -35,7 +35,7 @@ The service accepts a Steam Store product URL, downloads and parses the product 
 ## Project Structure
 
 ```text
-price_monitor_api/
+price-monitor-api/
 ├── data/                         # SQLite database
 ├── docs/                         # Additional project documentation
 ├── logs/                         # Application logs
